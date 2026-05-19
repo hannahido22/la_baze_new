@@ -194,12 +194,7 @@ export default function VideoShowcase() {
             {/* Card 3 — Prix adaptés */}
             <div className="glass-card p-3 sm:p-4 md:p-6 text-center group hover:border-emerald-400/30 transition-all duration-300">
               <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center mx-auto mb-2 sm:mb-3 group-hover:bg-emerald-400/20 transition-colors">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M12 7v10" />
-                  <path d="M9 8.5c1.333-.667 3.333-.667 4.666 0 1.333.667 1.333 2.333 0 3-1.333.667-3.333.667-4.666 0" />
-                  <path d="M9 13.5c1.333-.667 3.333-.667 4.666 0 1.333.667 1.333 2.333 0 3" />
-                </svg>
+                <span className="text-emerald-400 text-xl sm:text-2xl font-bold">€</span>
               </div>
               <h3 className="font-mono text-[10px] sm:text-xs md:text-sm font-bold uppercase text-white mb-0.5 sm:mb-1">Prix adaptés</h3>
               <p className="font-mono text-[9px] sm:text-[10px] text-white/40 leading-relaxed hidden sm:block">Tarifs justes et transparents</p>
