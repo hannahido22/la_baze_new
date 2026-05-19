@@ -69,6 +69,13 @@ export default function Footer() {
           Atelier de réparation électronique indépendant
         </div>
       </div>
+
+      <img
+        src="/signiture.png"
+        alt=""
+        aria-hidden="true"
+        className="absolute bottom-3 right-4 h-8 sm:h-10 rounded-xl pointer-events-none select-none"
+      />
     </footer>
   );
 }

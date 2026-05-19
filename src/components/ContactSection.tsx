@@ -7,18 +7,21 @@ gsap.registerPlugin(ScrollTrigger);
 
 const contacts = [
   {
+    id: 'contact-email',
     label: 'Email',
     value: 'labazerepair@gmail.com',
     href: 'mailto:labazerepair@gmail.com',
     icon: <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-electric-blue group-hover:text-burnt-orange transition-colors" />,
   },
   {
+    id: 'contact-phone',
     label: 'Téléphone',
     value: '+32 493 14 19 73',
     href: 'tel:+32493141973',
     icon: <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-electric-blue group-hover:text-burnt-orange transition-colors" />,
   },
   {
+    id: 'contact-instagram',
     label: 'Instagram',
     value: '@labazerepair',
     href: 'https://instagram.com/labazerepair',
@@ -30,6 +33,7 @@ const contacts = [
     external: true,
   },
   {
+    id: 'contact-facebook',
     label: 'Facebook',
     value: 'La Baze Repair',
     href: 'https://facebook.com/labazerepair',
@@ -41,6 +45,7 @@ const contacts = [
     external: true,
   },
   {
+    id: 'contact-whatsapp',
     label: 'WhatsApp',
     value: '+32 493 14 19 73',
     href: 'https://wa.me/32493141973',
@@ -96,6 +101,7 @@ export default function ContactSection() {
           {contacts.map((contact) => (
             <a
               key={contact.label}
+              id={contact.id}
               href={contact.href}
               target={contact.external ? '_blank' : undefined}
               rel={contact.external ? 'noopener noreferrer' : undefined}

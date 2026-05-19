@@ -368,19 +368,19 @@ export default function DevisSection() {
 
           {/* ─── STEP 3: Model ─── */}
           {flow.device && flow.brand && !flow.model && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <div className="flow-stage animate-in fade-in slide-in-from-bottom-4 duration-300" data-stage="model">
               <div className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-white/50 mb-3 sm:mb-4">
                 Modèle
               </div>
               {flow.device === 'telephone' && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                   {flow.brand === 'apple' && Object.entries(APPLE_PRICES).map(([key, data]) => (
-                    <button key={key} onClick={() => selectModel(key)} className="p-3 sm:p-4 bg-white/5 border border-white/10 rounded-xl hover:border-electric-blue/50 hover:bg-white/10 transition-all text-left">
+                    <button key={key} onClick={() => selectModel(key)} className="flow-chip p-3 sm:p-4 bg-white/5 border border-white/10 rounded-xl hover:border-electric-blue/50 hover:bg-white/10 transition-all text-left">
                       <span className="font-mono text-xs sm:text-sm">{data.label}</span>
                     </button>
                   ))}
                   {flow.brand === 'samsung' && Object.entries(SAMSUNG_PRICES).map(([key, data]) => (
-                    <button key={key} onClick={() => selectModel(key)} className="p-3 sm:p-4 bg-white/5 border border-white/10 rounded-xl hover:border-electric-blue/50 hover:bg-white/10 transition-all text-left">
+                    <button key={key} onClick={() => selectModel(key)} className="flow-chip p-3 sm:p-4 bg-white/5 border border-white/10 rounded-xl hover:border-electric-blue/50 hover:bg-white/10 transition-all text-left">
                       <span className="font-mono text-xs sm:text-sm">{data.label}</span>
                     </button>
                   ))}
@@ -392,7 +392,7 @@ export default function DevisSection() {
                     <button
                       key={model.id}
                       onClick={() => selectModel(model.id)}
-                      className="p-3 sm:p-4 bg-white/5 border border-white/10 rounded-xl hover:border-electric-blue/50 hover:bg-white/10 transition-all text-left"
+                      className="flow-chip p-3 sm:p-4 bg-white/5 border border-white/10 rounded-xl hover:border-electric-blue/50 hover:bg-white/10 transition-all text-left"
                     >
                       <span className="font-mono text-xs sm:text-sm">{model.label}</span>
                     </button>
