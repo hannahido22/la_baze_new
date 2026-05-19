@@ -316,7 +316,7 @@ export default function DevisSection() {
 
           {/* ─── STEP 1: Device Type ─── */}
           {!flow.device && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <div className="flow-stage animate-in fade-in slide-in-from-bottom-4 duration-300" data-stage="device">
               <div className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-white/50 mb-3 sm:mb-4">
                 Appareil
               </div>
@@ -325,7 +325,7 @@ export default function DevisSection() {
                   <button
                     key={opt.id}
                     onClick={() => selectDevice(opt.id)}
-                    className="p-4 sm:p-5 md:p-6 bg-white/5 border border-white/10 rounded-xl hover:border-electric-blue/50 hover:bg-white/10 transition-all group flex flex-col items-center text-center"
+                    className="flow-chip p-4 sm:p-5 md:p-6 bg-white/5 border border-white/10 rounded-xl hover:border-electric-blue/50 hover:bg-white/10 transition-all group flex flex-col items-center text-center"
                   >
                     <span className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 mb-3 sm:mb-4 group-hover:scale-110 transition-transform inline-block" style={{ color: deviceColors[opt.id] }}>
                       {deviceIcons[opt.id]}
