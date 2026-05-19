@@ -324,6 +324,7 @@ export default function DevisSection() {
                 {deviceOptions.map((opt) => (
                   <button
                     key={opt.id}
+                    id={`device-${opt.id}`}
                     onClick={() => selectDevice(opt.id)}
                     className="flow-chip p-4 sm:p-5 md:p-6 bg-white/5 border border-white/10 rounded-xl hover:border-electric-blue/50 hover:bg-white/10 transition-all group flex flex-col items-center text-center"
                   >

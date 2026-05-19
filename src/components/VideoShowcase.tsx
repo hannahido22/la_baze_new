@@ -209,13 +209,13 @@ export default function VideoShowcase() {
           className="fixed inset-0 z-[70] bg-[#140a0f]/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
           onClick={closeLightbox}
         >
-          {/* Close X */}
+          {/* Close X — fixed so it's always reachable on mobile */}
           <button
             onClick={closeLightbox}
-            className="hidden sm:flex absolute top-20 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 items-center justify-center transition-colors z-10"
+            className="fixed top-4 right-4 flex w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 items-center justify-center transition-colors z-[80]"
             aria-label="Fermer"
           >
-            <X className="w-6 h-6 text-white" />
+            <X className="w-5 h-5 text-white" />
           </button>
 
           <div
@@ -239,14 +239,6 @@ export default function VideoShowcase() {
               </div>
             </div>
 
-            {/* Mobile close */}
-            <button
-              onClick={closeLightbox}
-              className="sm:hidden mt-4 flex items-center justify-center gap-2 w-full max-w-[200px] py-3 px-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-colors"
-            >
-              <X className="w-5 h-5 text-white" />
-              <span className="font-mono text-sm font-bold uppercase text-white">Fermer</span>
-            </button>
           </div>
         </div>
       )}
