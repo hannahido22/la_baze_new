@@ -1,40 +1,23 @@
 import { useRef, useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ArrowRight, Youtube } from 'lucide-react';
+import { hasVideo, youtubeEmbedUrl } from '@/lib/youtube';
+import { videos, FEATURED_COUNT, type ShowcaseVideo } from '@/data/videos';
+import VideoLightbox from './VideoLightbox';
 
 gsap.registerPlugin(ScrollTrigger);
-import { X } from 'lucide-react';
 
-const videos = [
-  {
-    src: '/gallery-ps4-hdmi.mp4',
-    title: 'PS4 HDMI',
-    subtitle: 'Reconstruction des pins HDMI endommagés — soudure microscopique sur port de connexion console',
-  },
-  {
-    src: '/gallery-phone-ram.mp4',
-    title: 'Asus RAM',
-    subtitle: 'Reballing mémoire RAM téléphone — réparation soudures BGA chip mémoire sur carte mère',
-  },
-  {
-    src: '/gallery-iphone11-screen.mp4',
-    title: 'iPhone 11',
-    subtitle: 'Remplacement écran complet — démontage, transfert composants et assemblage précis',
-  },
-  {
-    src: '/nand_reball_new.mp4',
-    title: 'NAND Reball',
-    subtitle: 'Reballing puce NAND Flash — refonte complète des billes BGA sur mémoire de stockage',
-  },
-];
+// Vidéos mises en avant sur l'accueil. La liste complète vit dans
+// src/data/videos.ts et s'affiche sur la page /videos.
+const featured = videos.slice(0, FEATURED_COUNT);
 
 export default function VideoShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const inlineVideoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-  const [lightbox, setLightbox] = useState<{ src: string; title: string; subtitle: string } | null>(null);
-  const lightboxVideoRef = useRef<HTMLVideoElement>(null);
+  const [lightbox, setLightbox] = useState<ShowcaseVideo | null>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -53,8 +36,8 @@ export default function VideoShowcase() {
           { opacity: 0, y: 50, scale: 0.95 },
           {
             opacity: 1, y: 0, scale: 1,
-            duration: 0.6, delay: i * 0.12, ease: 'power3.out',
-            scrollTrigger: { trigger: card, start: 'top 90%', toggleActions: 'play none none none' },
+            duration: 0.6, delay: i * 0.1, ease: 'power3.out',
+            scrollTrigger: { trigger: card, start: 'top 95%', toggleActions: 'play none none none' },
           }
         );
       });
@@ -63,47 +46,10 @@ export default function VideoShowcase() {
     return () => ctx.revert();
   }, []);
 
-  // Auto-play all visible videos
-  useEffect(() => {
-    inlineVideoRefs.current.forEach((v) => {
-      if (v) {
-        v.muted = true;
-        v.play().catch(() => {});
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (lightbox && lightboxVideoRef.current) {
-      lightboxVideoRef.current.play().catch(() => {});
-    }
-  }, [lightbox]);
-
-  const openLightbox = (video: typeof videos[0]) => {
-    setLightbox({ src: video.src, title: video.title, subtitle: video.subtitle });
-    document.body.style.overflow = 'hidden';
+  const openLightbox = (video: ShowcaseVideo) => {
+    if (!hasVideo(video.youtubeId)) return; // emplacement vide → rien à ouvrir
+    setLightbox(video);
   };
-
-  const closeLightbox = () => {
-    if (lightboxVideoRef.current) {
-      lightboxVideoRef.current.pause();
-      lightboxVideoRef.current.currentTime = 0;
-    }
-    setLightbox(null);
-    document.body.style.overflow = '';
-    // Resume inline videos
-    inlineVideoRefs.current.forEach((v) => {
-      if (v) v.play().catch(() => {});
-    });
-  };
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeLightbox();
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, []);
 
   return (
     <>
@@ -131,43 +77,65 @@ export default function VideoShowcase() {
             </h2>
           </div>
 
-          {/* 4 equal video cards grid — always 2x2 even on phones */}
+          {/* Grille de vidéos — 2 colonnes, lecture auto en sourdine */}
           <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
-            {videos.map((video, i) => (
-              <div
-                key={i}
-                ref={(el) => { cardsRef.current[i] = el; }}
-                className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-white/10 bg-[#140a0f] cursor-pointer hover:border-burnt-orange/40 hover:shadow-[0_0_20px_rgba(255,107,53,0.15)] transition-all duration-500 group"
-                style={{ opacity: 0 }}
-                onClick={() => openLightbox(video)}
-              >
-                {/* Video container — auto-playing */}
-                <div className="relative aspect-video">
-                  <video
-                    ref={(el) => { inlineVideoRefs.current[i] = el; }}
-                    src={video.src}
-                    className="w-full h-full object-cover"
-                    muted
-                    playsInline
-                    loop
-                    autoPlay
-                    preload="auto"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#140a0f]/60 via-transparent to-transparent pointer-events-none" />
-                  <div className="absolute inset-0 bg-[#140a0f]/0 group-hover:bg-[#140a0f]/20 transition-colors duration-300 pointer-events-none" />
-                </div>
+            {featured.map((video, i) => {
+              const live = hasVideo(video.youtubeId);
+              return (
+                <div
+                  key={i}
+                  ref={(el) => { cardsRef.current[i] = el; }}
+                  className={`relative overflow-hidden rounded-xl sm:rounded-2xl border border-white/10 bg-[#140a0f] transition-all duration-500 group ${live ? 'cursor-pointer hover:border-burnt-orange/40 hover:shadow-[0_0_20px_rgba(255,107,53,0.15)]' : ''}`}
+                  style={{ opacity: 0 }}
+                  onClick={() => openLightbox(video)}
+                >
+                  {/* Conteneur 16:9 */}
+                  <div className="relative aspect-video">
+                    {live ? (
+                      <>
+                        <iframe
+                          src={youtubeEmbedUrl(video.youtubeId, { autoplay: true, mute: true, loop: true, controls: false })}
+                          className="absolute inset-0 w-full h-full"
+                          title={video.title}
+                          allow="autoplay; encrypted-media; picture-in-picture"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          frameBorder={0}
+                        />
+                        {/* Capte le clic (l'iframe l'avalerait) pour ouvrir la vidéo en grand */}
+                        <div className="absolute inset-0 z-10" aria-hidden="true" />
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1c1013] to-[#140a0f] text-white/40">
+                        <Youtube className="w-6 h-6 sm:w-8 sm:h-8 text-burnt-orange/60" />
+                        <span className="font-mono text-[8px] sm:text-[10px] uppercase tracking-widest">Bientôt en ligne</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#140a0f]/50 via-transparent to-transparent pointer-events-none" />
+                  </div>
 
-                {/* Title only below */}
-                <div className="p-1.5 sm:p-2 md:p-3 lg:p-4">
-                  <h3 className="font-mono text-[8px] sm:text-[10px] md:text-xs lg:text-sm font-bold uppercase truncate text-white">
-                    {video.title}
-                  </h3>
+                  {/* Titre sous la vidéo */}
+                  <div className="p-1.5 sm:p-2 md:p-3 lg:p-4">
+                    <h3 className="font-mono text-[8px] sm:text-[10px] md:text-xs lg:text-sm font-bold uppercase truncate text-white">
+                      {video.title}
+                    </h3>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          {/* 3 Value proposition cards */}
+          {/* Bouton « Voir plus » → page dédiée avec toutes les vidéos */}
+          <div className="mt-5 sm:mt-6 flex justify-center">
+            <Link
+              to="/videos"
+              className="flex items-center gap-2 rounded-full border border-burnt-orange/40 bg-burnt-orange/10 px-6 py-3.5 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-burnt-orange hover:bg-burnt-orange/20 hover:border-burnt-orange/60 transition-all"
+            >
+              Voir plus
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* 3 cartes valeurs */}
           <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 mt-4 sm:mt-6">
             {/* Card 1 — Garantie */}
             <div className="glass-card p-3 sm:p-4 md:p-6 text-center group hover:border-electric-blue/30 transition-all duration-300">
@@ -203,45 +171,8 @@ export default function VideoShowcase() {
         </div>
       </section>
 
-      {/* ─── LIGHTBOX ─── */}
-      {lightbox && (
-        <div
-          className="fixed inset-0 z-[70] bg-[#140a0f]/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
-          onClick={closeLightbox}
-        >
-          {/* Close X — below nav on mobile, top-right on desktop */}
-          <button
-            onClick={closeLightbox}
-            className="fixed top-[72px] right-4 md:top-6 md:right-6 flex w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 items-center justify-center transition-colors z-[80]"
-            aria-label="Fermer"
-          >
-            <X className="w-5 h-5 text-white" />
-          </button>
-
-          <div
-            className="relative max-w-5xl max-h-[85vh] w-full flex flex-col items-center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <video
-              ref={lightboxVideoRef}
-              src={lightbox.src}
-              className="max-w-full max-h-[75vh] rounded-xl w-full"
-              controls
-              playsInline
-              autoPlay
-            />
-            <div className="mt-3 sm:mt-4 text-center">
-              <div className="font-mono text-sm sm:text-base font-bold uppercase text-white">
-                {lightbox.title}
-              </div>
-              <div className="font-mono text-[10px] sm:text-xs text-white/50 mt-1 max-w-lg mx-auto">
-                {lightbox.subtitle}
-              </div>
-            </div>
-
-          </div>
-        </div>
-      )}
+      {/* ─── LIGHTBOX (vidéo en grand, avec son) ─── */}
+      {lightbox && <VideoLightbox video={lightbox} onClose={() => setLightbox(null)} />}
     </>
   );
 }

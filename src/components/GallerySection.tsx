@@ -1,38 +1,49 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Play, X } from 'lucide-react';
+import { Play, X, Youtube } from 'lucide-react';
+import { hasVideo, youtubeEmbedUrl, youtubeThumb } from '@/lib/youtube';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const mediaItems = [
+// ─────────────────────────────────────────────────────────────
+//  MÉDIAS DE LA GALERIE
+//  - Les PHOTOS restent locales (fichiers dans /public).
+//  - Les VIDÉOS viennent de YouTube : collez l'ID dans "youtubeId"
+//    (voir src/lib/youtube.ts). Laissez '' pour un emplacement « bientôt ».
+// ─────────────────────────────────────────────────────────────
+type MediaItem =
+  | { type: 'photo'; src: string; title: string; subtitle: string }
+  | { type: 'video'; youtubeId: string; title: string; subtitle: string };
+
+const mediaItems: MediaItem[] = [
   {
-    type: 'photo' as const,
+    type: 'photo',
     src: '/gallery-1.jpg',
     title: 'PS5 HDMI',
     subtitle: 'Reconstruction des pins HDMI endommagés — soudure microscopique sur port de connexion console',
   },
   {
-    type: 'photo' as const,
+    type: 'photo',
     src: '/gallery-2.jpg',
     title: 'Chip I/O',
     subtitle: 'Réparation circuit entrée/sortie — remplacement du contrôleur de communication USB/Audio',
   },
   {
-    type: 'video' as const,
-    src: '/gallery-3.mp4',
+    type: 'video',
+    youtubeId: '',
     title: 'PS5 Southbridge',
     subtitle: 'Reballing IC southbridge — refonte des soudures BGA sous station infrarouge',
   },
   {
-    type: 'video' as const,
-    src: '/gallery-4.mp4',
+    type: 'video',
+    youtubeId: '',
     title: 'Asus RAM',
     subtitle: 'Reballing mémoire RAM téléphone — réparation soudures BGA chip mémoire sur carte mère',
   },
   {
-    type: 'video' as const,
-    src: '/gallery-5.mp4',
+    type: 'video',
+    youtubeId: '',
     title: 'iPhone 11',
     subtitle: 'Remplacement écran complet — démontage, transfert composants et assemblage précis',
   },
@@ -42,8 +53,7 @@ export default function GallerySection() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const [lightbox, setLightbox] = useState<{ type: 'photo' | 'video'; src: string; title: string } | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [lightbox, setLightbox] = useState<MediaItem | null>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -71,22 +81,13 @@ export default function GallerySection() {
     return () => ctx.revert();
   }, []);
 
-  useEffect(() => {
-    if (lightbox?.type === 'video' && videoRef.current) {
-      videoRef.current.play().catch(() => {});
-    }
-  }, [lightbox]);
-
-  const openLightbox = useCallback((item: typeof mediaItems[0]) => {
-    setLightbox({ type: item.type, src: item.src, title: item.title });
+  const openLightbox = useCallback((item: MediaItem) => {
+    if (item.type === 'video' && !hasVideo(item.youtubeId)) return; // emplacement vide
+    setLightbox(item);
     document.body.style.overflow = 'hidden';
   }, []);
 
   const closeLightbox = useCallback(() => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
     setLightbox(null);
     document.body.style.overflow = '';
   }, []);
@@ -125,57 +126,59 @@ export default function GallerySection() {
           </p>
         </div>
 
-        {/* Gallery Grid — all equal squares */}
+        {/* Grille — carrés égaux */}
         <div ref={gridRef} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-          {mediaItems.map((item, i) => (
-            <button
-              key={i}
-              onClick={() => openLightbox(item)}
-              className="gallery-card group text-left"
-              style={{ opacity: 0 }}
-            >
-              {/* Media container */}
-              <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-white/10 bg-[#140a0f] transition-all duration-500 group-hover:border-white/20 group-hover:shadow-lg aspect-square">
-                {item.type === 'photo' ? (
-                  <img
-                    src={item.src}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                ) : (
-                  <video
-                    src={item.src}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    muted
-                    playsInline
-                    preload="metadata"
-                    onLoadedMetadata={(e) => {
-                      const v = e.currentTarget;
-                      v.currentTime = 0.1;
-                      v.pause();
-                    }}
-                  />
-                )}
+          {mediaItems.map((item, i) => {
+            const live = item.type === 'photo' || hasVideo(item.youtubeId);
+            return (
+              <button
+                key={i}
+                onClick={() => openLightbox(item)}
+                className={`gallery-card group text-left ${live ? '' : 'cursor-default'}`}
+                style={{ opacity: 0 }}
+              >
+                {/* Conteneur média */}
+                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-white/10 bg-[#140a0f] transition-all duration-500 group-hover:border-white/20 group-hover:shadow-lg aspect-square">
+                  {item.type === 'photo' ? (
+                    <img
+                      src={item.src}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  ) : live ? (
+                    <img
+                      src={youtubeThumb(item.youtubeId)}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#0d1420] to-[#140a0f] text-white/40">
+                      <Youtube className="w-6 h-6 sm:w-7 sm:h-7 text-electric-blue/60" />
+                      <span className="font-mono text-[8px] sm:text-[9px] uppercase tracking-widest">Bientôt</span>
+                    </div>
+                  )}
 
-                {item.type === 'video' && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:bg-white/20 transition-all">
-                    <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-white ml-0.5" />
+                  {item.type === 'video' && live && (
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:bg-white/20 transition-all">
+                      <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-white ml-0.5" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Titre + description */}
+                <div className="mt-2 sm:mt-3 px-0.5">
+                  <div className="font-mono text-xs sm:text-sm font-bold uppercase text-white">
+                    {item.title}
                   </div>
-                )}
-              </div>
-
-              {/* Title and description below the media */}
-              <div className="mt-2 sm:mt-3 px-0.5">
-                <div className="font-mono text-xs sm:text-sm font-bold uppercase text-white">
-                  {item.title}
+                  <div className="font-mono text-[10px] sm:text-xs text-white/50 mt-0.5">
+                    {item.subtitle}
+                  </div>
                 </div>
-                <div className="font-mono text-[10px] sm:text-xs text-white/50 mt-0.5">
-                  {item.subtitle}
-                </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -186,7 +189,7 @@ export default function GallerySection() {
           style={{ opacity: 1 }}
           onClick={closeLightbox}
         >
-          {/* Top X — desktop */}
+          {/* X — desktop */}
           <button
             onClick={closeLightbox}
             className="hidden sm:flex absolute top-20 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 items-center justify-center transition-colors z-10"
@@ -195,7 +198,7 @@ export default function GallerySection() {
             <X className="w-6 h-6 text-white" />
           </button>
 
-          {/* Media */}
+          {/* Média */}
           <div
             className="relative max-w-5xl max-h-[80vh] sm:max-h-[85vh] w-full flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
@@ -207,14 +210,17 @@ export default function GallerySection() {
                 className="max-w-full max-h-[75vh] object-contain rounded-xl"
               />
             ) : (
-              <video
-                ref={videoRef}
-                src={lightbox.src}
-                className="max-w-full max-h-[75vh] rounded-xl"
-                controls
-                playsInline
-                autoPlay
-              />
+              <div className="relative w-full aspect-video max-h-[75vh]">
+                <iframe
+                  src={youtubeEmbedUrl(lightbox.youtubeId, { autoplay: true, controls: true })}
+                  className="absolute inset-0 w-full h-full rounded-xl"
+                  title={lightbox.title}
+                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  frameBorder={0}
+                />
+              </div>
             )}
 
             <div className="mt-3 sm:mt-4 text-center hidden sm:block">
@@ -226,7 +232,7 @@ export default function GallerySection() {
               </div>
             </div>
 
-            {/* Mobile bottom close bar — big thumb-friendly button */}
+            {/* Bouton fermer — mobile */}
             <button
               onClick={closeLightbox}
               className="sm:hidden mt-4 flex items-center justify-center gap-2 w-full max-w-[200px] py-3 px-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-colors"

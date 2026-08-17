@@ -1,18 +1,13 @@
 import { useEffect } from 'react';
+import { Routes, Route } from 'react-router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CursorSpotlight from './components/CursorSpotlight';
 import FloatingParticles from './components/FloatingParticles';
 import Navigation from './components/Navigation';
-import VideoShowcase from './components/VideoShowcase';
-import HeroSection from './components/HeroSection';
-import DeviceMarquee from './components/DeviceMarquee';
-import ExpertisesSection from './components/ExpertisesSection';
-import DevisSection from './components/DevisSection';
-import ProcessSection from './components/ProcessSection';
-import GallerySection from './components/GallerySection';
-import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
+import HomePage from './pages/HomePage';
+import VideosPage from './pages/VideosPage';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,16 +23,11 @@ function App() {
       <FloatingParticles />
       <Navigation />
 
-      <main className="relative z-10">
-        <VideoShowcase />
-        <HeroSection />
-        <DevisSection />
-        <DeviceMarquee />
-        <ExpertisesSection />
-        <ProcessSection />
-        <GallerySection />
-        <ContactSection />
-      </main>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/videos" element={<VideosPage />} />
+        <Route path="*" element={<HomePage />} />
+      </Routes>
 
       <Footer />
     </div>

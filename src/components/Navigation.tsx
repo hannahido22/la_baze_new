@@ -1,10 +1,26 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router';
 import TextScramble from './TextScramble';
+
+type NavLink =
+  | { label: string; id: string; kind: 'scroll' }
+  | { label: string; to: string; kind: 'route' };
+
+const navLinks: NavLink[] = [
+  { label: 'Expertises', id: 'services', kind: 'scroll' },
+  { label: 'Devis', id: 'devis', kind: 'scroll' },
+  { label: 'Processus', id: 'process', kind: 'scroll' },
+  { label: 'Galerie', id: 'gallery', kind: 'scroll' },
+  { label: 'Vidéos', to: '/videos', kind: 'route' },
+  { label: 'Contact', id: 'contact', kind: 'scroll' },
+];
 
 export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,25 +30,23 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Défile vers une section. Si on n'est pas sur l'accueil, on y retourne d'abord.
   const scrollTo = useCallback((id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      // Close menu first
-      setMenuOpen(false);
-      // Small delay to let menu close before scrolling
-      setTimeout(() => {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
+    setMenuOpen(false);
+    const doScroll = () => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(doScroll, 350); // laisse l'accueil se rendre
+    } else {
+      setTimeout(doScroll, 300); // laisse le menu se fermer
     }
-  }, []);
+  }, [location.pathname, navigate]);
 
-  const navLinks = [
-    { label: 'Expertises', id: 'services' },
-    { label: 'Devis', id: 'devis' },
-    { label: 'Processus', id: 'process' },
-    { label: 'Galerie', id: 'gallery' },
-    { label: 'Contact', id: 'contact' },
-  ];
+  const goHome = useCallback(() => {
+    setMenuOpen(false);
+    if (location.pathname !== '/') navigate('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [location.pathname, navigate]);
 
   return (
     <>
@@ -46,13 +60,7 @@ export default function Navigation() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-1.5 sm:py-2 flex items-center justify-between">
           {/* Logo */}
-          <div
-            className="cursor-pointer z-50"
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setMenuOpen(false);
-            }}
-          >
+          <div className="cursor-pointer z-50" onClick={goHome}>
             <img
               src="/logo.jpg"
               alt="La Baze Repair"
@@ -62,15 +70,25 @@ export default function Navigation() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
-                className="font-mono text-xs font-medium uppercase tracking-wider text-white/70 hover:text-white transition-colors"
-              >
-                <TextScramble text={item.label} />
-              </button>
-            ))}
+            {navLinks.map((item) =>
+              item.kind === 'route' ? (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  className="font-mono text-xs font-medium uppercase tracking-wider text-white/70 hover:text-white transition-colors"
+                >
+                  <TextScramble text={item.label} />
+                </Link>
+              ) : (
+                <button
+                  key={item.label}
+                  onClick={() => scrollTo(item.id)}
+                  className="font-mono text-xs font-medium uppercase tracking-wider text-white/70 hover:text-white transition-colors"
+                >
+                  <TextScramble text={item.label} />
+                </button>
+              )
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -86,13 +104,13 @@ export default function Navigation() {
         </div>
       </nav>
 
-      {/* Mobile menu overlay — completely separate from nav, full screen solid bg */}
+      {/* Menu mobile — plein écran, fond opaque */}
       <div
         className={`md:hidden fixed inset-0 z-[60] bg-[#140a0f] flex flex-col items-center justify-center gap-5 transition-all duration-500 ${
           menuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
       >
-        {/* Close X button */}
+        {/* Bouton fermer */}
         <button
           onClick={() => setMenuOpen(false)}
           className="absolute top-4 right-4 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
@@ -103,20 +121,23 @@ export default function Navigation() {
           </svg>
         </button>
 
-        {navLinks.map((item, i) => (
-          <button
-            key={item.id}
-            onClick={() => scrollTo(item.id)}
-            className="block font-mono text-2xl sm:text-3xl font-bold uppercase tracking-wider text-white/90 hover:text-electric-blue transition-colors py-3 sm:py-4"
-            style={{
-              transform: menuOpen ? 'translateY(0)' : 'translateY(30px)',
-              opacity: menuOpen ? 1 : 0,
-              transition: `all 0.4s ease ${i * 0.08}s`,
-            }}
-          >
-            {item.label}
-          </button>
-        ))}
+        {navLinks.map((item, i) => {
+          const style = {
+            transform: menuOpen ? 'translateY(0)' : 'translateY(30px)',
+            opacity: menuOpen ? 1 : 0,
+            transition: `all 0.4s ease ${i * 0.08}s`,
+          } as const;
+          const cls = 'block font-mono text-2xl sm:text-3xl font-bold uppercase tracking-wider text-white/90 hover:text-electric-blue transition-colors py-3 sm:py-4';
+          return item.kind === 'route' ? (
+            <Link key={item.label} to={item.to} onClick={() => setMenuOpen(false)} className={cls} style={style}>
+              {item.label}
+            </Link>
+          ) : (
+            <button key={item.label} onClick={() => scrollTo(item.id)} className={cls} style={style}>
+              {item.label}
+            </button>
+          );
+        })}
       </div>
     </>
   );
