@@ -6,6 +6,7 @@ interface Particle {
 }
 
 const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export default function FloatingParticles() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -15,16 +16,21 @@ export default function FloatingParticles() {
     const container = containerRef.current;
     if (!container) return;
 
-    const particleCount = isTouchDevice ? 20 : 35;
+    // Perf : désactivé sur mobile et en mode "réduire les animations".
+    // Des particules animées derrière des cartes en flou forcent un recalcul
+    // du flou à chaque frame — coûteux, surtout sur téléphone.
+    if (isTouchDevice || reduceMotion) return;
+
+    const particleCount = 14;
     const particles: Particle[] = [];
 
     for (let i = 0; i < particleCount; i++) {
       const el = document.createElement('div');
-      const size = isTouchDevice ? Math.random() * 5 + 3 : Math.random() * 8 + 4;
+      const size = Math.random() * 7 + 4;
       const isCircle = Math.random() > 0.35;
       const isBlue = Math.random() > 0.5;
-      const opacity = Math.random() * 0.35 + 0.2;
-      const glowSize = Math.random() * 12 + 6;
+      const opacity = Math.random() * 0.3 + 0.18;
+      const glowSize = Math.random() * 10 + 6;
 
       el.style.cssText = `
         position: absolute;
@@ -36,41 +42,32 @@ export default function FloatingParticles() {
         left: ${Math.random() * 100}%;
         top: ${Math.random() * 100}%;
         box-shadow: 0 0 ${glowSize}px ${isBlue ? `rgba(26, 79, 214, 0.5)` : `rgba(241, 90, 36, 0.5)`};
+        will-change: transform;
       `;
 
       container.appendChild(el);
 
-      // Float movement
+      // Déplacement doux (transform uniquement = composité, peu coûteux).
       gsap.to(el, {
-        y: `+=${Math.random() * 80 - 40}`,
-        x: `+=${Math.random() * 80 - 40}`,
-        duration: Math.random() * 5 + 4,
+        y: `+=${Math.random() * 70 - 35}`,
+        x: `+=${Math.random() * 70 - 35}`,
+        duration: Math.random() * 5 + 5,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut',
         delay: Math.random() * 4,
       });
 
-      // Pulse opacity
+      // Pulsation d'opacité (composité). Pas de scale : éviterait de re-rasteriser
+      // l'ombre portée à chaque frame.
       gsap.to(el, {
-        opacity: Math.random() * 0.2 + 0.15,
-        scale: Math.random() * 0.4 + 0.9,
-        duration: Math.random() * 2.5 + 2,
+        opacity: Math.random() * 0.2 + 0.12,
+        duration: Math.random() * 2.5 + 2.5,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut',
         delay: Math.random() * 2,
       });
-
-      // Slow rotation for non-circles
-      if (!isCircle) {
-        gsap.to(el, {
-          rotation: Math.random() * 360,
-          duration: Math.random() * 15 + 10,
-          repeat: -1,
-          ease: 'none',
-        });
-      }
 
       particles.push({ element: el });
     }
@@ -84,6 +81,8 @@ export default function FloatingParticles() {
       });
     };
   }, []);
+
+  if (isTouchDevice || reduceMotion) return null;
 
   return (
     <div

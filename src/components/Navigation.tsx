@@ -54,7 +54,7 @@ export default function Navigation() {
         ref={navRef}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled || menuOpen
-            ? 'bg-[#140a0f]/90 backdrop-blur-xl border-b border-white/5'
+            ? 'bg-[#140a0f]/95 border-b border-white/5'
             : 'bg-transparent'
         }`}
       >

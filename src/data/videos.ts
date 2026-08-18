@@ -2,13 +2,16 @@
 //  TOUTES LES VIDÉOS YOUTUBE
 //
 //  Un seul endroit pour gérer les vidéos du site.
-//  - Les FEATURED_COUNT premières s'affichent sur l'accueil (lecture auto).
-//  - Le bouton « Voir plus » mène à la page /videos qui affiche TOUTE la liste.
+//  - Les FEATURED_COUNT premières s'affichent sur l'accueil.
+//  - Le bouton « Voir plus » mène à la page /videos (toute la liste).
 //
-//  Pour ajouter une vidéo : ajoutez une ligne avec l'ID YouTube.
+//  ⚠️ Renomme chaque vidéo (title/subtitle) selon son contenu réel —
+//     les titres ci-dessous sont des exemples à ajuster.
+//
+//  Pour ajouter/changer une vidéo : mets l'ID YouTube dans youtubeId.
 //    URL:  https://www.youtube.com/watch?v=dQw4w9WgXcQ
-//    ID :  dQw4w9WgXcQ   (la partie après "v=")
-//  Laissez youtubeId: '' pour un emplacement « bientôt en ligne ».
+//    ou :  https://youtu.be/dQw4w9WgXcQ  ou  /shorts/dQw4w9WgXcQ
+//    ID :  dQw4w9WgXcQ
 // ─────────────────────────────────────────────────────────────
 
 export type ShowcaseVideo = {
@@ -21,34 +24,15 @@ export type ShowcaseVideo = {
 export const FEATURED_COUNT = 4;
 
 export const videos: ShowcaseVideo[] = [
-  {
-    youtubeId: '',
-    title: 'PS4 HDMI',
-    subtitle: 'Reconstruction des pins HDMI endommagés — soudure microscopique sur port de connexion console',
-  },
-  {
-    youtubeId: '',
-    title: 'Asus RAM',
-    subtitle: 'Reballing mémoire RAM téléphone — réparation soudures BGA chip mémoire sur carte mère',
-  },
-  {
-    youtubeId: '',
-    title: 'iPhone 11',
-    subtitle: 'Remplacement écran complet — démontage, transfert composants et assemblage précis',
-  },
-  {
-    youtubeId: '',
-    title: 'NAND Reball',
-    subtitle: 'Reballing puce NAND Flash — refonte complète des billes BGA sur mémoire de stockage',
-  },
-  {
-    youtubeId: '',
-    title: 'PS5 Southbridge',
-    subtitle: 'Reballing IC southbridge — refonte des soudures BGA sous station infrarouge',
-  },
-  {
-    youtubeId: '',
-    title: 'Chip I/O',
-    subtitle: 'Réparation circuit entrée/sortie — remplacement du contrôleur de communication USB/Audio',
-  },
+  { youtubeId: 'LdfEmJt5SXo', title: 'Réparation microsoudure', subtitle: 'Intervention de précision sur carte électronique.' },
+  { youtubeId: 'q2Lr_aln87Y', title: 'Reballing BGA', subtitle: 'Refonte des billes de soudure sous une puce.' },
+  { youtubeId: 'hd3JEY1o7to', title: 'Réparation carte mère', subtitle: 'Diagnostic et réparation au niveau composant.' },
+  { youtubeId: 'dQj3OuxqSII', title: 'Remplacement écran', subtitle: 'Démontage, transfert et remontage soigné.' },
+  { youtubeId: 'r1q65GCgl20', title: 'Réparation console', subtitle: 'Intervention sur console de jeux.' },
+  { youtubeId: 'IIykdQlWC3c', title: 'Port de charge', subtitle: 'Réparation / remplacement du connecteur de charge.' },
+  { youtubeId: 'JX4uQ7938zE', title: 'Réparation HDMI', subtitle: 'Reconstruction du port HDMI.' },
+  { youtubeId: '3GK-CQlcYk4', title: 'Récupération de données', subtitle: 'Sauvegarde des données après panne.' },
+  { youtubeId: 'vsO_PHt0uDk', title: 'Dommage liquide', subtitle: 'Nettoyage et remise en état après oxydation.' },
+  { youtubeId: '-vE22BsnhBQ', title: 'Réparation smartphone', subtitle: 'Intervention sur téléphone.' },
+  { youtubeId: 'rEtuYS_r0-8', title: 'Diagnostic & réparation', subtitle: 'Diagnostic complet et réparation en atelier.' },
 ];

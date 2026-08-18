@@ -5,6 +5,13 @@ import MonospacedDecoder from './MonospacedDecoder';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Perf : les animations SVG (points mouvants, étincelles) sont lourdes.
+// On les réserve au desktop et on les coupe si l'utilisateur préfère
+// réduire les animations. Mobile = circuit statique (léger).
+const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const showMotion = !isTouchDevice && !reduceMotion;
+
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const bracketsRef = useRef<HTMLDivElement>(null);
@@ -69,16 +76,10 @@ export default function HeroSection() {
       {/* Animated SVG circuit background */}
       <div ref={imageRef} className="absolute inset-0 z-0 overflow-hidden" style={{ opacity: 0 }}>
         <svg className="w-full h-full" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="tg2" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="1.5" result="b" />
-              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-          </defs>
           <rect width="100%" height="100%" fill="#140a0f" />
 
           {/* Dense traces */}
-          <g filter="url(#tg2)">
+          <g>
             {/* Horizontal */}
             <line x1="0" y1="80" x2="1200" y2="80" stroke="#00a8e8" strokeWidth="1" opacity="0.1" />
             <line x1="0" y1="150" x2="1200" y2="150" stroke="#00a8e8" strokeWidth="1.5" opacity="0.14" />
@@ -152,8 +153,8 @@ export default function HeroSection() {
             <circle cx="300" cy="450" r="2" fill="#00a8e8" opacity="0.2" />
           </g>
 
-          {/* FAST MOVING DOTS */}
-          <g>
+          {/* FAST MOVING DOTS — desktop uniquement (perf) */}
+          {showMotion && <g>
             {/* Horizontal - fast */}
             <circle r="3" fill="#00a8e8" opacity="0.9">
               <animateMotion path="M-20,80 L1220,80" dur="1.8s" repeatCount="indefinite" />
@@ -280,10 +281,10 @@ export default function HeroSection() {
             <circle r="2" fill="#ffffff" opacity="0.45">
               <animateMotion path="M680,810 L680,-10" dur="1.4s" repeatCount="indefinite" begin="1s" />
             </circle>
-          </g>
+          </g>}
 
-          {/* Spark flashes */}
-          <g>
+          {/* Spark flashes — desktop uniquement (perf) */}
+          {showMotion && <g>
             <circle cx="300" cy="150" r="0" fill="#00a8e8" opacity="0">
               <animate attributeName="r" values="0;8;0" dur="2s" repeatCount="indefinite" />
               <animate attributeName="opacity" values="0;0.5;0" dur="2s" repeatCount="indefinite" />
@@ -316,16 +317,7 @@ export default function HeroSection() {
               <animate attributeName="r" values="0;10;0" dur="2.5s" repeatCount="indefinite" begin="1.8s" />
               <animate attributeName="opacity" values="0;0.55;0" dur="2.5s" repeatCount="indefinite" begin="1.8s" />
             </circle>
-          </g>
-
-          {/* Dot grid */}
-          <g opacity="0.04">
-            {Array.from({ length: 40 }).map((_, i) =>
-              Array.from({ length: 27 }).map((_, j) => (
-                <circle key={`gd${i}-${j}`} cx={i * 30 + 15} cy={j * 30 + 15} r="0.6" fill="#00a8e8" />
-              ))
-            )}
-          </g>
+          </g>}
         </svg>
         <div className="absolute inset-0 bg-gradient-to-t from-[#140a0f] via-[#140a0f]/60 to-[#140a0f]/40" />
       </div>

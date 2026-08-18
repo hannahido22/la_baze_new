@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CursorSpotlight from './components/CursorSpotlight';
 import FloatingParticles from './components/FloatingParticles';
 import Navigation from './components/Navigation';
+import SocialBubbles from './components/SocialBubbles';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import VideosPage from './pages/VideosPage';
@@ -22,6 +23,7 @@ function App() {
       <CursorSpotlight />
       <FloatingParticles />
       <Navigation />
+      <SocialBubbles />
 
       <Routes>
         <Route path="/" element={<HomePage />} />

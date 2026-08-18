@@ -2,8 +2,8 @@ import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Youtube } from 'lucide-react';
-import { hasVideo, youtubeEmbedUrl } from '@/lib/youtube';
+import { ArrowRight, Play, Youtube } from 'lucide-react';
+import { hasVideo, youtubeThumb } from '@/lib/youtube';
 import { videos, FEATURED_COUNT, type ShowcaseVideo } from '@/data/videos';
 import VideoLightbox from './VideoLightbox';
 
@@ -33,10 +33,10 @@ export default function VideoShowcase() {
       cardsRef.current.forEach((card, i) => {
         if (!card) return;
         gsap.fromTo(card,
-          { opacity: 0, y: 50, scale: 0.95 },
+          { opacity: 0, y: 40 },
           {
-            opacity: 1, y: 0, scale: 1,
-            duration: 0.6, delay: i * 0.1, ease: 'power3.out',
+            opacity: 1, y: 0,
+            duration: 0.5, delay: i * 0.08, ease: 'power3.out',
             scrollTrigger: { trigger: card, start: 'top 95%', toggleActions: 'play none none none' },
           }
         );
@@ -47,7 +47,7 @@ export default function VideoShowcase() {
   }, []);
 
   const openLightbox = (video: ShowcaseVideo) => {
-    if (!hasVideo(video.youtubeId)) return; // emplacement vide → rien à ouvrir
+    if (!hasVideo(video.youtubeId)) return;
     setLightbox(video);
   };
 
@@ -77,7 +77,7 @@ export default function VideoShowcase() {
             </h2>
           </div>
 
-          {/* Grille de vidéos — 2 colonnes, lecture auto en sourdine */}
+          {/* Grille de vidéos — miniatures légères, clic pour lire avec le son */}
           <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
             {featured.map((video, i) => {
               const live = hasVideo(video.youtubeId);
@@ -89,20 +89,19 @@ export default function VideoShowcase() {
                   style={{ opacity: 0 }}
                   onClick={() => openLightbox(video)}
                 >
-                  {/* Conteneur 16:9 */}
+                  {/* Miniature 16:9 */}
                   <div className="relative aspect-video">
                     {live ? (
                       <>
-                        <iframe
-                          src={youtubeEmbedUrl(video.youtubeId, { autoplay: true, mute: true, loop: true, controls: false })}
-                          className="absolute inset-0 w-full h-full"
-                          title={video.title}
-                          allow="autoplay; encrypted-media; picture-in-picture"
-                          referrerPolicy="strict-origin-when-cross-origin"
-                          frameBorder={0}
+                        <img
+                          src={youtubeThumb(video.youtubeId)}
+                          alt={video.title}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          loading="lazy"
                         />
-                        {/* Capte le clic (l'iframe l'avalerait) pour ouvrir la vidéo en grand */}
-                        <div className="absolute inset-0 z-10" aria-hidden="true" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:bg-burnt-orange/80 transition-colors">
+                          <Play className="w-4 h-4 sm:w-6 sm:h-6 text-white fill-white ml-0.5" />
+                        </div>
                       </>
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1c1013] to-[#140a0f] text-white/40">
