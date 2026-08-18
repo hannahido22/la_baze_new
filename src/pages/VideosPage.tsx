@@ -92,9 +92,11 @@ export default function VideosPage() {
                   <div className="font-mono text-xs sm:text-sm font-bold uppercase text-white truncate">
                     {video.title}
                   </div>
-                  <div className="font-mono text-[10px] sm:text-xs text-white/50 mt-0.5 line-clamp-2">
-                    {video.subtitle}
-                  </div>
+                  {video.subtitle && (
+                    <div className="font-mono text-[10px] sm:text-xs text-white/50 mt-0.5 line-clamp-2">
+                      {video.subtitle}
+                    </div>
+                  )}
                 </div>
               </button>
             );

@@ -2,8 +2,8 @@ import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Play, Youtube } from 'lucide-react';
-import { hasVideo, youtubeThumb } from '@/lib/youtube';
+import { ArrowRight, Youtube } from 'lucide-react';
+import { hasVideo, youtubeEmbedUrl } from '@/lib/youtube';
 import { videos, FEATURED_COUNT, type ShowcaseVideo } from '@/data/videos';
 import VideoLightbox from './VideoLightbox';
 
@@ -89,19 +89,20 @@ export default function VideoShowcase() {
                   style={{ opacity: 0 }}
                   onClick={() => openLightbox(video)}
                 >
-                  {/* Miniature 16:9 */}
+                  {/* Vidéo 16:9 — lecture auto en sourdine dès l'arrivée */}
                   <div className="relative aspect-video">
                     {live ? (
                       <>
-                        <img
-                          src={youtubeThumb(video.youtubeId)}
-                          alt={video.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          loading="lazy"
+                        <iframe
+                          src={youtubeEmbedUrl(video.youtubeId, { autoplay: true, mute: true, loop: true, controls: false })}
+                          className="absolute inset-0 w-full h-full"
+                          title={video.title}
+                          allow="autoplay; encrypted-media; picture-in-picture"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          frameBorder={0}
                         />
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:bg-burnt-orange/80 transition-colors">
-                          <Play className="w-4 h-4 sm:w-6 sm:h-6 text-white fill-white ml-0.5" />
-                        </div>
+                        {/* Capte le clic (l'iframe l'avalerait) pour ouvrir en grand avec le son */}
+                        <div className="absolute inset-0 z-10" aria-hidden="true" />
                       </>
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1c1013] to-[#140a0f] text-white/40">

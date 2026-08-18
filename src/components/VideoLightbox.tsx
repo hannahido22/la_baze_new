@@ -57,9 +57,11 @@ export default function VideoLightbox({
           <div className="font-mono text-sm sm:text-base font-bold uppercase text-white">
             {video.title}
           </div>
-          <div className="font-mono text-[10px] sm:text-xs text-white/50 mt-1 max-w-lg mx-auto">
-            {video.subtitle}
-          </div>
+          {video.subtitle && (
+            <div className="font-mono text-[10px] sm:text-xs text-white/50 mt-1 max-w-lg mx-auto">
+              {video.subtitle}
+            </div>
+          )}
         </div>
       </div>
     </div>
