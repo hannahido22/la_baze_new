@@ -89,7 +89,7 @@ export default function VideosPage() {
 
                 {/* Titre + description */}
                 <div className="mt-2 sm:mt-3 px-0.5">
-                  <div className="font-mono text-xs sm:text-sm font-bold uppercase text-white truncate">
+                  <div title={video.title} className="font-mono text-xs sm:text-sm font-bold uppercase text-white line-clamp-2 leading-snug">
                     {video.title}
                   </div>
                   {video.subtitle && (

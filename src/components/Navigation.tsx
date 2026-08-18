@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router';
 import TextScramble from './TextScramble';
+import SocialBubbles from './SocialBubbles';
 
 type NavLink =
   | { label: string; id: string; kind: 'scroll' }
@@ -68,6 +69,8 @@ export default function Navigation() {
             />
           </div>
 
+          {/* Côté droit : liens (desktop) + réseaux sociaux + menu */}
+          <div className="flex items-center gap-3 sm:gap-4 md:gap-5">
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((item) =>
@@ -91,6 +94,9 @@ export default function Navigation() {
             )}
           </div>
 
+          {/* Réseaux sociaux — rangée horizontale, près du menu */}
+          <SocialBubbles />
+
           {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -101,6 +107,7 @@ export default function Navigation() {
             <span className={`w-5 h-[2px] bg-white transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
             <span className={`w-5 h-[2px] bg-white transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-[5px]' : ''}`} />
           </button>
+          </div>
         </div>
       </nav>
 
