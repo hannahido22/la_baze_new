@@ -104,7 +104,7 @@ export default function ReviewsSection() {
           <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="w-8 sm:w-12 h-[2px] bg-electric-blue" />
             <span className="font-mono text-[10px] sm:text-xs font-medium uppercase tracking-[0.3em] text-electric-blue">
-              Avis clients
+              Témoignages
             </span>
             <div className="w-8 sm:w-12 h-[2px] bg-electric-blue" />
           </div>
@@ -112,9 +112,9 @@ export default function ReviewsSection() {
             className="font-mono font-bold uppercase leading-[0.95] tracking-tight"
             style={{ fontSize: 'clamp(28px, 6vw, 72px)' }}
           >
-            Ils me font<br />
+            Ce que disent<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-blue to-cyan-400">
-              confiance
+              mes clients
             </span>
           </h2>
           <p className="font-mono text-xs sm:text-sm text-white/50 mt-3 sm:mt-4 max-w-md mx-auto">

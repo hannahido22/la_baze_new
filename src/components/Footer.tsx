@@ -1,36 +1,11 @@
-import { useRef, useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
-
 const marqueeText = 'TÉLÉPHONE • TABLETTE • ORDINATEUR • CONSOLE • MICROSOUDURE • RÉPARATION • ';
 
 export default function Footer() {
-  const marqueeRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const marquee = marqueeRef.current;
-    if (!marquee) return;
-
-    // Slow base speed, minimal acceleration on scroll
-    marquee.style.animationDuration = '60s';
-
-    const handleScroll = () => {
-      const velocity = Math.abs(window.scrollY) / 1000;
-      const duration = Math.max(40, 60 - velocity * 5);
-      marquee.style.animationDuration = `${duration}s`;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <footer className="relative overflow-hidden">
-      {/* Infinite Marquee */}
+      {/* Infinite Marquee — vitesse constante (indépendante du scroll) */}
       <div className="marquee-container py-2 sm:py-4 border-t border-white/5">
-        <div ref={marqueeRef} className="marquee-content">
+        <div className="marquee-content" style={{ animationDuration: '40s' }}>
           <span className="font-mono font-bold uppercase text-white/90 whitespace-nowrap" style={{ fontSize: 'clamp(20px, 4vw, 60px)' }}>
             {marqueeText}
           </span>

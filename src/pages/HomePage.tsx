@@ -4,7 +4,6 @@ import DeviceMarquee from '@/components/DeviceMarquee';
 import ExpertisesSection from '@/components/ExpertisesSection';
 import DevisSection from '@/components/DevisSection';
 import ProcessSection from '@/components/ProcessSection';
-import GallerySection from '@/components/GallerySection';
 import ReviewsSection from '@/components/ReviewsSection';
 import ContactSection from '@/components/ContactSection';
 
@@ -17,7 +16,6 @@ export default function HomePage() {
       <DeviceMarquee />
       <ExpertisesSection />
       <ProcessSection />
-      <GallerySection />
       <ReviewsSection />
       <ContactSection />
     </main>

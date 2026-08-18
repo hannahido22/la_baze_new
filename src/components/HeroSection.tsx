@@ -8,9 +8,11 @@ gsap.registerPlugin(ScrollTrigger);
 // Perf : les animations SVG (points mouvants, étincelles) sont lourdes.
 // On les réserve au desktop et on les coupe si l'utilisateur préfère
 // réduire les animations. Mobile = circuit statique (léger).
-const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const showMotion = !isTouchDevice && !reduceMotion;
+// Animation du circuit rétablie sur mobile aussi (on garde juste le respect
+// du réglage "réduire les animations"). Le gros coût venait du flou SVG + de
+// la grille de 1080 points, désormais supprimés.
+const showMotion = !reduceMotion;
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -71,7 +73,7 @@ export default function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-10 pt-16 sm:pt-20 pb-16 sm:pb-24"
+      className="relative min-h-[70vh] flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-10 pt-16 sm:pt-20 pb-12 sm:pb-16"
     >
       {/* Animated SVG circuit background */}
       <div ref={imageRef} className="absolute inset-0 z-0 overflow-hidden" style={{ opacity: 0 }}>

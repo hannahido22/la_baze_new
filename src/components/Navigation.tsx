@@ -11,7 +11,6 @@ const navLinks: NavLink[] = [
   { label: 'Expertises', id: 'services', kind: 'scroll' },
   { label: 'Devis', id: 'devis', kind: 'scroll' },
   { label: 'Processus', id: 'process', kind: 'scroll' },
-  { label: 'Galerie', id: 'gallery', kind: 'scroll' },
   { label: 'Vidéos', to: '/videos', kind: 'route' },
   { label: 'Contact', id: 'contact', kind: 'scroll' },
 ];
