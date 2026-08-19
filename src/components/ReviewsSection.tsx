@@ -19,7 +19,9 @@ const ELFSIGHT_SRC = 'https://elfsightcdn.com/platform.js';
 
 // Avis Trustpilot — TrustBox.
 const TRUSTPILOT = {
-  businessUnitId: 'IFzOYGi3O4CdjGiB',
+  // businessUnitId d'AFFICHAGE (≠ ID du script d'invitation) — récupéré sur la
+  // page Trustpilot publique de labazerepair.be.
+  businessUnitId: '6a83857897e1caec9da5be0f',
   templateId: '53aa8912dec7e10d38f59f36', // gabarit « Carrousel »
   height: '240px',
   profileUrl: '', // optionnel : lien de secours vers la page Trustpilot
