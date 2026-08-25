@@ -13,10 +13,10 @@ export default function HomePage() {
       <VideoShowcase />
       <HeroSection />
       <DevisSection />
+      <ReviewsSection />
       <DeviceMarquee />
       <ExpertisesSection />
       <ProcessSection />
-      <ReviewsSection />
       <ContactSection />
     </main>
   );
