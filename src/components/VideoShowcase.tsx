@@ -23,6 +23,8 @@ const featured: FeaturedClip[] = [
   { mp4: '/clip-lenovo.mp4', youtubeId: 'q2Lr_aln87Y', title: 'Lenovo Thinkpad' },
   { mp4: '/clip-button.mp4', youtubeId: 'dQj3OuxqSII', title: 'Soudure bouton' },
   { mp4: '/clip-ps4-hdmi.mp4', youtubeId: 'JX4uQ7938zE', title: 'PS4 HDMI' },
+  { mp4: '/clip-switch.mp4', youtubeId: '-vE22BsnhBQ', title: 'Nintendo Switch' },
+  { mp4: '/clip-ps5.mp4', youtubeId: '3GK-CQlcYk4', title: 'PS5 Southbridge' },
 ];
 
 export default function VideoShowcase() {
@@ -95,7 +97,7 @@ export default function VideoShowcase() {
           </div>
 
           {/* Grille — clips locaux en lecture auto, clic = vidéo complète avec son */}
-          <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
             {featured.map((clip, i) => (
               <div
                 key={i}
