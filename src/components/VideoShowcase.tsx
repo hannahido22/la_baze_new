@@ -19,10 +19,10 @@ gsap.registerPlugin(ScrollTrigger);
 type FeaturedClip = { mp4: string; youtubeId: string; title: string };
 
 const featured: FeaturedClip[] = [
+  { mp4: '/clip-usbc.mp4', youtubeId: 'LdfEmJt5SXo', title: 'Port USB-C' },
+  { mp4: '/clip-lenovo.mp4', youtubeId: 'q2Lr_aln87Y', title: 'Lenovo Thinkpad' },
+  { mp4: '/clip-button.mp4', youtubeId: 'dQj3OuxqSII', title: 'Soudure bouton' },
   { mp4: '/clip-ps4-hdmi.mp4', youtubeId: 'JX4uQ7938zE', title: 'PS4 HDMI' },
-  { mp4: '/clip-ram.mp4', youtubeId: 'rEtuYS_r0-8', title: 'Reballing RAM' },
-  { mp4: '/clip-iphone11.mp4', youtubeId: 'hd3JEY1o7to', title: 'Écran iPhone 11' },
-  { mp4: '/clip-nand.mp4', youtubeId: 'r1q65GCgl20', title: 'NAND Reball' },
 ];
 
 export default function VideoShowcase() {
