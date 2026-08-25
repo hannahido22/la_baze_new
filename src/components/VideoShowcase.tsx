@@ -2,21 +2,34 @@ import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Play, Youtube } from 'lucide-react';
-import { hasVideo, youtubeThumb } from '@/lib/youtube';
-import { videos, FEATURED_COUNT, type ShowcaseVideo } from '@/data/videos';
+import { ArrowRight, Play } from 'lucide-react';
+import { type ShowcaseVideo } from '@/data/videos';
 import VideoLightbox from './VideoLightbox';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Vidéos mises en avant sur l'accueil. La liste complète vit dans
-// src/data/videos.ts et s'affiche sur la page /videos.
-const featured = videos.slice(0, FEATURED_COUNT);
+// ─────────────────────────────────────────────────────────────
+//  VIDÉOS D'ACCUEIL — 4 clips LOCAUX (.mp4) en lecture auto (boucle,
+//  sans son) dès le chargement de la page. Au clic → vidéo complète
+//  avec le son (YouTube) dans la fenêtre agrandie.
+//
+//  Les clips sont des versions courtes/allégées dans /public.
+//  youtubeId = la vidéo complète correspondante (pour le clic).
+// ─────────────────────────────────────────────────────────────
+type FeaturedClip = { mp4: string; youtubeId: string; title: string };
+
+const featured: FeaturedClip[] = [
+  { mp4: '/clip-ps4-hdmi.mp4', youtubeId: 'JX4uQ7938zE', title: 'PS4 HDMI' },
+  { mp4: '/clip-ram.mp4', youtubeId: 'rEtuYS_r0-8', title: 'Reballing RAM' },
+  { mp4: '/clip-iphone11.mp4', youtubeId: 'hd3JEY1o7to', title: 'Écran iPhone 11' },
+  { mp4: '/clip-nand.mp4', youtubeId: 'r1q65GCgl20', title: 'NAND Reball' },
+];
 
 export default function VideoShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [lightbox, setLightbox] = useState<ShowcaseVideo | null>(null);
 
   useEffect(() => {
@@ -46,10 +59,14 @@ export default function VideoShowcase() {
     return () => ctx.revert();
   }, []);
 
-  const openLightbox = (video: ShowcaseVideo) => {
-    if (!hasVideo(video.youtubeId)) return;
-    setLightbox(video);
-  };
+  // Lecture auto fiable en sourdine dès l'arrivée.
+  useEffect(() => {
+    videoRefs.current.forEach((v) => {
+      if (!v) return;
+      v.muted = true;
+      v.play().catch(() => {});
+    });
+  }, []);
 
   return (
     <>
@@ -77,50 +94,43 @@ export default function VideoShowcase() {
             </h2>
           </div>
 
-          {/* Grille de vidéos — miniatures légères, clic pour lire avec le son */}
+          {/* Grille — clips locaux en lecture auto, clic = vidéo complète avec son */}
           <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
-            {featured.map((video, i) => {
-              const live = hasVideo(video.youtubeId);
-              return (
-                <div
-                  key={i}
-                  ref={(el) => { cardsRef.current[i] = el; }}
-                  className={`relative overflow-hidden rounded-xl sm:rounded-2xl border border-white/10 bg-[#140a0f] transition-all duration-500 group ${live ? 'cursor-pointer hover:border-burnt-orange/40 hover:shadow-[0_0_20px_rgba(255,107,53,0.15)]' : ''}`}
-                  style={{ opacity: 0 }}
-                  onClick={() => openLightbox(video)}
-                >
-                  {/* Miniature 16:9 — nette, clic = lecture plein écran avec le son */}
-                  <div className="relative aspect-video">
-                    {live ? (
-                      <>
-                        <img
-                          src={youtubeThumb(video.youtubeId)}
-                          alt={video.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:bg-burnt-orange/80 transition-colors">
-                          <Play className="w-4 h-4 sm:w-6 sm:h-6 text-white fill-white ml-0.5" />
-                        </div>
-                      </>
-                    ) : (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1c1013] to-[#140a0f] text-white/40">
-                        <Youtube className="w-6 h-6 sm:w-8 sm:h-8 text-burnt-orange/60" />
-                        <span className="font-mono text-[8px] sm:text-[10px] uppercase tracking-widest">Bientôt en ligne</span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#140a0f]/50 via-transparent to-transparent pointer-events-none" />
+            {featured.map((clip, i) => (
+              <div
+                key={i}
+                ref={(el) => { cardsRef.current[i] = el; }}
+                className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-white/10 bg-[#140a0f] cursor-pointer hover:border-burnt-orange/40 hover:shadow-[0_0_20px_rgba(255,107,53,0.15)] transition-all duration-500 group"
+                style={{ opacity: 0 }}
+                onClick={() => setLightbox({ youtubeId: clip.youtubeId, title: clip.title })}
+              >
+                <div className="relative aspect-video">
+                  <video
+                    ref={(el) => { videoRefs.current[i] = el; }}
+                    src={clip.mp4}
+                    className="w-full h-full object-cover"
+                    muted
+                    loop
+                    autoPlay
+                    playsInline
+                    preload="auto"
+                  />
+                  {/* Voile + bouton lecture (indique qu'on peut ouvrir en grand avec le son) */}
+                  <div className="absolute inset-0 bg-[#140a0f]/0 group-hover:bg-[#140a0f]/25 transition-colors duration-300" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 backdrop-blur-sm border border-white/25 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-white ml-0.5" />
                   </div>
-
-                  {/* Titre sous la vidéo (complet) */}
-                  <div className="p-1.5 sm:p-2 md:p-3 lg:p-4">
-                    <h3 title={video.title} className="font-mono text-[8px] sm:text-[10px] md:text-xs lg:text-sm font-bold uppercase text-white line-clamp-2 leading-snug">
-                      {video.title}
-                    </h3>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#140a0f]/50 via-transparent to-transparent pointer-events-none" />
                 </div>
-              );
-            })}
+
+                {/* Titre */}
+                <div className="p-1.5 sm:p-2 md:p-3 lg:p-4">
+                  <h3 className="font-mono text-[8px] sm:text-[10px] md:text-xs lg:text-sm font-bold uppercase truncate text-white">
+                    {clip.title}
+                  </h3>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Bouton « Voir plus » → page dédiée avec toutes les vidéos */}
@@ -170,7 +180,7 @@ export default function VideoShowcase() {
         </div>
       </section>
 
-      {/* ─── LIGHTBOX (vidéo en grand, avec son) ─── */}
+      {/* ─── LIGHTBOX (vidéo complète avec son, via YouTube) ─── */}
       {lightbox && <VideoLightbox video={lightbox} onClose={() => setLightbox(null)} />}
     </>
   );
