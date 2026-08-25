@@ -1,63 +1,58 @@
+import { useEffect } from 'react';
 import { Star } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────
-//  SECTION AVIS — avis affichés en dur (fiable, aux couleurs du site).
-//
-//  Les widgets Google (Elfsight) / Trustpilot (TrustBox) n'affichaient pas
-//  le contenu des avis (connexion de la fiche Google requise côté Elfsight,
-//  texte des avis souvent réservé au plan payant côté Trustpilot). On affiche
-//  donc les vrais avis ici. Pour en ajouter un : ajoute une ligne dans reviews[].
-//
-//  Les badges « note globale » et boutons renvoient aux vrais profils
-//  (preuve d'authenticité + collecte de nouveaux avis).
+//  SECTION AVIS
+//   • GOOGLE     : widget Elfsight (AUTOMATIQUE — se met à jour tout seul
+//                  une fois la fiche Google connectée dans elfsight.com).
+//   • TRUSTPILOT : avis affichés en dur (MANUEL — ajoute une ligne dans
+//                  reviews[] ; le texte des avis n'est pas dispo côté widget
+//                  gratuit Trustpilot).
 // ─────────────────────────────────────────────────────────────
 
-type Source = 'google' | 'trustpilot';
+// Widget Google (Elfsight). Vide = bloc Google masqué.
+const ELFSIGHT_GOOGLE_APP = 'elfsight-app-191fd064-b825-477f-8c77-5732099b0a34';
+const ELFSIGHT_SRC = 'https://elfsightcdn.com/platform.js';
 
-type Review = {
-  source: Source;
-  author: string;
-  rating: number; // 1 à 5
-  text: string;
-  date: string;
+const TRUSTPILOT = {
+  rating: 4.1,
+  count: 5,
+  profileUrl: 'https://www.trustpilot.com/review/labazerepair.be',
+  reviewUrl: 'https://www.trustpilot.com/evaluate/labazerepair.be',
 };
 
-// Notes globales + liens par plateforme.
-const PLATFORMS = {
-  trustpilot: {
-    rating: 4.1,
-    count: 5,
-    profileUrl: 'https://www.trustpilot.com/review/labazerepair.be',
-    reviewUrl: 'https://www.trustpilot.com/evaluate/labazerepair.be',
-  },
-  google: {
-    rating: 0, // ← à remplir (note Google)
-    count: 0, // ← à remplir (nombre d'avis Google)
-    profileUrl: '', // ← lien vers ta fiche Google
-    reviewUrl: '', // ← lien "laisser un avis" Google
-  },
-};
-
-// Les avis, du plus récent au plus ancien.
+// Avis Trustpilot, du plus récent au plus ancien.
+type Review = { author: string; rating: number; text: string; date: string };
 const reviews: Review[] = [
-  { source: 'trustpilot', author: 'Augustin Jonard', rating: 5, date: 'Août 2026', text: 'Contact rapide, professionnel et avisé. Qualité au top. Je recommande fortement !' },
-  { source: 'trustpilot', author: 'George Hanna', rating: 5, date: 'Août 2026', text: 'Très bonne expérience, je recommande fortement !' },
-  { source: 'trustpilot', author: 'Michle Malkoun', rating: 5, date: 'Août 2026', text: "Très bon service rapide et fiable. Il a changé le châssis de mon téléphone en même pas 2h, et il est revenu comme neuf." },
-  { source: 'trustpilot', author: 'Hadi Diallo', rating: 5, date: 'Août 2026', text: "Excellent travail de micro soudure sur une carte de lave-vaisselle. Bon conseil pour renforcer l'interrupteur sur la carte avec du silicone. En prime une petite vidéo du travail réalisé. Je recommande fortement." },
-  { source: 'trustpilot', author: 'Lebario Kuriakos', rating: 5, date: 'Juillet 2026', text: "Très bon réparateur, je recommande. J'ai réparé mon iPhone 14 Pro Max ainsi que mon ordinateur. Je suis très satisfait, impeccable 👌" },
+  { author: 'Augustin Jonard', rating: 5, date: 'Août 2026', text: 'Contact rapide, professionnel et avisé. Qualité au top. Je recommande fortement !' },
+  { author: 'George Hanna', rating: 5, date: 'Août 2026', text: 'Très bonne expérience, je recommande fortement !' },
+  { author: 'Michle Malkoun', rating: 5, date: 'Août 2026', text: "Très bon service rapide et fiable. Il a changé le châssis de mon téléphone en même pas 2h, et il est revenu comme neuf." },
+  { author: 'Hadi Diallo', rating: 5, date: 'Août 2026', text: "Excellent travail de micro soudure sur une carte de lave-vaisselle. Bon conseil pour renforcer l'interrupteur sur la carte avec du silicone. En prime une petite vidéo du travail réalisé. Je recommande fortement." },
+  { author: 'Lebario Kuriakos', rating: 5, date: 'Juillet 2026', text: "Très bon réparateur, je recommande. J'ai réparé mon iPhone 14 Pro Max ainsi que mon ordinateur. Je suis très satisfait, impeccable 👌" },
 ];
 
-function Stars({ rating, color = '#f59e0b', size = 'w-4 h-4' }: { rating: number; color?: string; size?: string }) {
+function useExternalScript(src: string | undefined) {
+  useEffect(() => {
+    if (!src) return;
+    if (document.querySelector(`script[src="${src}"]`)) return;
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    document.body.appendChild(s);
+  }, [src]);
+}
+
+function Stars({ rating, color = '#f59e0b' }: { rating: number; color?: string }) {
   return (
     <div className="flex items-center gap-0.5">
       {[0, 1, 2, 3, 4].map((i) => (
-        <Star key={i} className={size} style={{ color, fill: i < Math.round(rating) ? color : 'transparent' }} strokeWidth={1.5} />
+        <Star key={i} className="w-4 h-4" style={{ color, fill: i < Math.round(rating) ? color : 'transparent' }} strokeWidth={1.5} />
       ))}
     </div>
   );
 }
 
-function GoogleMark({ className = 'w-4 h-4' }: { className?: string }) {
+function GoogleMark({ className = 'w-5 h-5' }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -68,52 +63,13 @@ function GoogleMark({ className = 'w-4 h-4' }: { className?: string }) {
   );
 }
 
-function SourceTag({ source }: { source: Source }) {
-  if (source === 'google') {
-    return (
-      <span className="inline-flex items-center gap-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-white/50">
-        <GoogleMark className="w-3.5 h-3.5" /> Google
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-white/50">
-      <Star className="w-3.5 h-3.5" style={{ color: '#00b67a', fill: '#00b67a' }} strokeWidth={0} /> Trustpilot
-    </span>
-  );
-}
-
 function initials(name: string) {
   return name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase();
 }
 
-// Badge « note globale » d'une plateforme.
-function OverallBadge({
-  label, mark, rating, count, starColor, profileUrl,
-}: { label: string; mark: React.ReactNode; rating: number; count: number; starColor: string; profileUrl: string }) {
-  return (
-    <a
-      href={profileUrl || undefined}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`glass-card flex items-center gap-3 rounded-xl px-4 py-3 border border-white/10 transition-colors ${profileUrl ? 'hover:border-white/25' : 'pointer-events-none'}`}
-    >
-      <div className="flex items-center gap-2">{mark}<span className="font-mono text-xs sm:text-sm font-bold uppercase text-white">{label}</span></div>
-      <div className="h-6 w-px bg-white/10" />
-      <div className="flex flex-col">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-base sm:text-lg font-bold text-white">{rating.toFixed(1)}</span>
-          <Stars rating={rating} color={starColor} />
-        </div>
-        <span className="font-mono text-[10px] text-white/50">{count} avis</span>
-      </div>
-    </a>
-  );
-}
-
 export default function ReviewsSection() {
-  const hasGoogle = PLATFORMS.google.count > 0;
-  const tp = PLATFORMS.trustpilot;
+  const hasGoogle = !!ELFSIGHT_GOOGLE_APP;
+  useExternalScript(hasGoogle ? ELFSIGHT_SRC : undefined);
 
   return (
     <section id="avis" className="relative py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-10">
@@ -132,19 +88,35 @@ export default function ReviewsSection() {
           <p className="font-mono text-xs sm:text-sm text-white/50 mt-3 sm:mt-4 max-w-md mx-auto">Avis vérifiés sur Google et Trustpilot.</p>
         </div>
 
-        {/* Badges note globale */}
-        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 sm:mb-10">
-          {hasGoogle && (
-            <OverallBadge label="Google" mark={<GoogleMark className="w-5 h-5" />} rating={PLATFORMS.google.rating} count={PLATFORMS.google.count} starColor="#FBBC05" profileUrl={PLATFORMS.google.profileUrl} />
-          )}
-          <OverallBadge
-            label="Trustpilot"
-            mark={<Star className="w-5 h-5" style={{ color: '#00b67a', fill: '#00b67a' }} strokeWidth={0} />}
-            rating={tp.rating} count={tp.count} starColor="#00b67a" profileUrl={tp.profileUrl}
-          />
+        {/* ─── GOOGLE — widget automatique ─── */}
+        {hasGoogle && (
+          <div className="mb-10 sm:mb-14">
+            <div className="flex items-center gap-2 mb-3 sm:mb-4">
+              <GoogleMark />
+              <span className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Avis Google</span>
+            </div>
+            <div className={`${ELFSIGHT_GOOGLE_APP} w-full min-h-[120px]`} data-elfsight-app-lazy="" />
+          </div>
+        )}
+
+        {/* ─── TRUSTPILOT — avis en dur ─── */}
+        <div className="flex items-center justify-between gap-3 mb-3 sm:mb-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Star className="w-5 h-5" style={{ color: '#00b67a', fill: '#00b67a' }} strokeWidth={0} />
+            <span className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Avis Trustpilot</span>
+          </div>
+          <a
+            href={TRUSTPILOT.profileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 font-mono text-[11px] sm:text-xs text-white/70 hover:text-white transition-colors"
+          >
+            <span className="font-bold text-white">{TRUSTPILOT.rating.toFixed(1)}</span>
+            <Stars rating={TRUSTPILOT.rating} color="#00b67a" />
+            <span className="text-white/50">· {TRUSTPILOT.count} avis</span>
+          </a>
         </div>
 
-        {/* Grille d'avis */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {reviews.map((r, i) => (
             <div key={i} className="glass-card rounded-2xl border border-white/10 p-5 flex flex-col gap-3">
@@ -158,7 +130,9 @@ export default function ReviewsSection() {
                     <div className="font-mono text-[10px] text-white/40">{r.date}</div>
                   </div>
                 </div>
-                <SourceTag source={r.source} />
+                <span className="inline-flex items-center gap-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-white/50">
+                  <Star className="w-3.5 h-3.5" style={{ color: '#00b67a', fill: '#00b67a' }} strokeWidth={0} /> Trustpilot
+                </span>
               </div>
               <Stars rating={r.rating} />
               <p className="font-mono text-xs sm:text-sm text-white/70 leading-relaxed">{r.text}</p>
@@ -166,10 +140,10 @@ export default function ReviewsSection() {
           ))}
         </div>
 
-        {/* CTA laisser un avis */}
-        <div className="flex flex-wrap justify-center gap-3 mt-8 sm:mt-10">
+        {/* CTA */}
+        <div className="flex justify-center mt-8 sm:mt-10">
           <a
-            href={tp.reviewUrl}
+            href={TRUSTPILOT.reviewUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 rounded-full px-6 py-3 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] text-white transition-all hover:opacity-90"
@@ -177,16 +151,6 @@ export default function ReviewsSection() {
           >
             <Star className="w-4 h-4" fill="currentColor" strokeWidth={0} /> Laisser un avis Trustpilot
           </a>
-          {PLATFORMS.google.reviewUrl && (
-            <a
-              href={PLATFORMS.google.reviewUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-full px-6 py-3 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] text-white border border-white/20 transition-colors hover:bg-white/10"
-            >
-              <GoogleMark className="w-4 h-4" /> Laisser un avis Google
-            </a>
-          )}
         </div>
       </div>
     </section>
