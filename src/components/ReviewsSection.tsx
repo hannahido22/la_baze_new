@@ -101,10 +101,15 @@ export default function ReviewsSection() {
 
         {/* ─── TRUSTPILOT — avis en dur ─── */}
         <div className="flex items-center justify-between gap-3 mb-3 sm:mb-4 flex-wrap">
-          <div className="flex items-center gap-2">
+          <a
+            href={TRUSTPILOT.profileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <Star className="w-5 h-5" style={{ color: '#00b67a', fill: '#00b67a' }} strokeWidth={0} />
             <span className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Avis Trustpilot</span>
-          </div>
+          </a>
           <a
             href={TRUSTPILOT.profileUrl}
             target="_blank"
@@ -141,7 +146,15 @@ export default function ReviewsSection() {
         </div>
 
         {/* CTA */}
-        <div className="flex justify-center mt-8 sm:mt-10">
+        <div className="flex flex-wrap justify-center gap-3 mt-8 sm:mt-10">
+          <a
+            href={TRUSTPILOT.profileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-full border border-[#00b67a]/50 bg-[#00b67a]/10 px-6 py-3 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] text-white transition-colors hover:bg-[#00b67a]/20"
+          >
+            <Star className="w-4 h-4" style={{ color: '#00b67a', fill: '#00b67a' }} strokeWidth={0} /> Voir les avis sur Trustpilot
+          </a>
           <a
             href={TRUSTPILOT.reviewUrl}
             target="_blank"
