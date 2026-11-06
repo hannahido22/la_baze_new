@@ -2,6 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router';
 import TextScramble from './TextScramble';
 import SocialBubbles from './SocialBubbles';
+import { Package } from 'lucide-react';
 
 type NavLink =
   | { label: string; id: string; kind: 'scroll' }
@@ -94,8 +95,20 @@ export default function Navigation() {
             )}
           </div>
 
-          {/* Réseaux sociaux — rangée horizontale, près du menu */}
-          <SocialBubbles />
+          {/* Envoyer par poste — CTA orange, visible dans le header */}
+          <button
+            onClick={() => scrollTo('colis')}
+            className="flex items-center gap-1.5 rounded-full border border-burnt-orange bg-burnt-orange/10 px-3 sm:px-4 py-1.5 sm:py-2 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider text-burnt-orange hover:bg-burnt-orange/20 transition-colors"
+          >
+            <Package className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Envoyer par poste</span>
+            <span className="sm:hidden">Poste</span>
+          </button>
+
+          {/* Réseaux sociaux — desktop/tablette (masqués sur mobile pour laisser la place au bouton Poste) */}
+          <div className="hidden sm:flex">
+            <SocialBubbles />
+          </div>
 
           {/* Mobile hamburger */}
           <button
